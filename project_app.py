@@ -60,7 +60,9 @@ if spectra_1_type != 'Nil':
     spectra_1_uploaded = st.file_uploader(spectra_1_label, key = "spectra_1_file")
     if spectra_1_uploaded is not None:
         spectra_1_file = pd.read_csv(spectra_1_uploaded)
-
+    else:
+        spectra_1_file = pd.DataFrame(np.zeros((1, 2090)))
+        st.write("No file is uploaded !")
 
 st.markdown('<hr class="hr">', unsafe_allow_html=True)
 
@@ -75,7 +77,9 @@ else:
         spectra_2_uploaded = st.file_uploader(spectra_2_label, key = "spectra_2_file")
         if spectra_2_uploaded is not None:
             spectra_2_file = pd.read_csv(spectra_2_uploaded)
-
+        else:
+            spectra_2_file = pd.DataFrame(np.zeros((1, 2090)))
+            st.write("No file is uploaded !")
 
 st.markdown('<hr class="hr">', unsafe_allow_html=True)
 
@@ -90,6 +94,9 @@ else:
         spectra_3_uploaded = st.file_uploader(spectra_3_label, key = "spectra_3_file")
         if spectra_3_uploaded is not None:
             spectra_3_file = pd.read_csv(spectra_3_uploaded)
+        else:
+            spectra_3_file = pd.DataFrame(np.zeros((1, 2090)))
+            st.write("No file is uploaded !")
 
 
 st.markdown('<hr class="hr">', unsafe_allow_html=True)
@@ -269,7 +276,6 @@ def prediction_triple(spectra_1, spectra_2, spectra_3, model, type_1, type_2, ty
     spectra_1_pred = tf.reshape(spectra_1_inp, [ rows, 2090, 1])
     spectra_2_pred = tf.reshape(spectra_2_inp, [ rows, 2090, 1])
     spectra_3_pred = tf.reshape(spectra_3_inp, [ rows, 2090, 1])
-    spectra_zero = tf.reshape(spectra_zero, [ rows, 2090, 1])
 
     if type_1 == 'COOH2':
         if type_2 == 'COOH':
