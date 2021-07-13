@@ -2,6 +2,11 @@ import streamlit as st
 import tensorflow as tf
 import pandas as pd
 import numpy as np
+
+from sklearn import preprocessing
+from scipy import sparse
+from scipy.sparse.linalg import spsolve
+
 import io
 
 
@@ -296,9 +301,56 @@ def prediction_triple(spectra_1, spectra_2, spectra_3, model, type_1, type_2, ty
     return prediction
 
 
+#asymmetric least squares smoothing method
+
+def baseline_als(y, lam, p, niter=10):
+  L = y.shape[0]
+  D = sparse.csc_matrix(np.diff(np.eye(L), 2))
+  w = np.ones(L)
+  for i in range(niter):
+    W = sparse.spdiags(w, 0, L, L)
+    Z = W + lam * D.dot(D.transpose())
+    z = spsolve(Z, w*y)
+    w = p * (y > z) + (1-p) * (y < z)
+  return z
+
+
 #output display for each row
 
 if st.button('Predict Chances'):
+
+    #Background removal of the spectra
+
+    corrected_spectra_1=np.zeros(spectra_1_file.shape)
+    corrected_spectra_2=np.zeros(spectra_2_file.shape)
+    corrected_spectra_3=np.zeros(spectra_3_file.shape)
+
+    baseline_spectra_1=np.zeros(spectra_1_file.shape)
+    baseline_spectra_2=np.zeros(spectra_2_file.shape)
+    baseline_spectra_3=np.zeros(spectra_3_file.shape)
+
+    for j in range(spectra_1_file.shape[0]):
+
+        baseline_spectra_1[j,:] = baseline_als(spectra_1_file.iloc[j,:],100000,0.01)
+        corrected_spectra_1[j,:] = spectra_1_file.iloc[j,:] - baseline_spectra_1[j,:]
+
+    for j in range(spectra_2_file.shape[0]):
+
+        baseline_spectra_2[j,:] = baseline_als(spectra_2_file.iloc[j,:],100000,0.01)
+        corrected_spectra_2[j,:] = spectra_2_file.iloc[j,:] - baseline_spectra_2[j,:]
+
+    for j in range(spectra_3_file.shape[0]):
+
+        baseline_spectra_3[j,:] = baseline_als(spectra_3_file.iloc[j,:],100000,0.01)
+        corrected_spectra_3[j,:] = spectra_3_file.iloc[j,:] - baseline_spectra_3[j,:]
+
+    #normalization of spectra data
+
+    spectra_1_file = pd.DataFrame(preprocessing.MinMaxScaler(feature_range=(0, 1)).fit(corrected_spectra_1).transform(corrected_spectra_1.astype(float)))
+    spectra_2_file = pd.DataFrame(preprocessing.MinMaxScaler(feature_range=(0, 1)).fit(corrected_spectra_2).transform(corrected_spectra_2.astype(float)))
+    spectra_3_file = pd.DataFrame(preprocessing.MinMaxScaler(feature_range=(0, 1)).fit(corrected_spectra_3).transform(corrected_spectra_3.astype(float)))
+
+    #assigning values for prediction function identification
 
     if spectra_1_type is 'Nil':
         s1 = 0
@@ -319,6 +371,8 @@ if st.button('Predict Chances'):
         st.error("No options selected!")
         probability = [10]
 
+    #calling the prediction functions corresponding to user input
+
     if s1+s2+s3 == 1:
         probability = prediction_single(spectra_1_file, model, spectra_1_type)
     elif s1+s2+s3 == 2:
@@ -333,6 +387,8 @@ if st.button('Predict Chances'):
         probability = prediction_double(spectra_2_file, spectra_3_file, model, spectra_2_type, spectra_3_type)
     elif s1+s2+s3 == 7:
         probability = prediction_triple(spectra_1_file, spectra_2_file, spectra_3_file, model, spectra_1_type, spectra_2_type, spectra_3_type)
+
+    #printing the results
 
     for i in range(len(probability)):
 
