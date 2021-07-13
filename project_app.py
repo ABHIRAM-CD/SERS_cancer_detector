@@ -61,6 +61,7 @@ st.write('**Predictions**')
 spectra_1_type = st.selectbox('Select Fuctional group for first spectra:',['Nil', 'COOH2', 'COOH', 'NH2'], key = "spectra_1")
 
 if spectra_1_type != 'Nil':
+    spectra_1_file = pd.DataFrame(np.zeros((1, 2090)))
     spectra_1_label = "Upload the file for spctrum with " + spectra_1_type + " functional group"
     spectra_1_uploaded = st.file_uploader(spectra_1_label, key = "spectra_1_file")
     if spectra_1_uploaded is not None:
@@ -78,6 +79,7 @@ spectra_2_type = st.selectbox('Select Fuctional group for second spectra:',['Nil
 
 if spectra_2_type == spectra_1_type and spectra_2_type != 'Nil':
     st.write("Already selcted option")
+    spectra_2_file = pd.DataFrame(np.zeros((1, 2090)))
 else:
     if spectra_2_type != 'Nil':
         spectra_2_label = "Upload the file for spctrum with " + spectra_2_type + " functional group"
@@ -97,6 +99,7 @@ spectra_3_type = st.selectbox('Select Fuctional group for third spectra:',['Nil'
 
 if (spectra_3_type == spectra_1_type or spectra_3_type == spectra_2_type) and spectra_2_type != 'Nil':
     st.write("Already selcted option")
+    spectra_3_file = pd.DataFrame(np.zeros((1, 2090)))
 else:
     if spectra_3_type != 'Nil':
         spectra_3_label = "Upload the file for spctrum with " + spectra_3_type + " functional group"
