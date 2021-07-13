@@ -68,6 +68,8 @@ if spectra_1_type != 'Nil':
     else:
         spectra_1_file = pd.DataFrame(np.zeros((1, 2090)))
         st.write("No file is uploaded !")
+else:
+    spectra_1_file = pd.DataFrame(np.zeros((1, 2090)))
 
 st.markdown('<hr class="hr">', unsafe_allow_html=True)
 
@@ -85,6 +87,8 @@ else:
         else:
             spectra_2_file = pd.DataFrame(np.zeros((1, 2090)))
             st.write("No file is uploaded !")
+    else:
+        spectra_2_file = pd.DataFrame(np.zeros((1, 2090)))
 
 st.markdown('<hr class="hr">', unsafe_allow_html=True)
 
@@ -102,6 +106,8 @@ else:
         else:
             spectra_3_file = pd.DataFrame(np.zeros((1, 2090)))
             st.write("No file is uploaded !")
+    else:
+        spectra_3_file = pd.DataFrame(np.zeros((1, 2090)))
 
 
 st.markdown('<hr class="hr">', unsafe_allow_html=True)
@@ -395,13 +401,13 @@ if st.button('Predict Chances'):
         if probability[i] == 10:
             break
 
-        elif probability[i]<0.3:
+        elif probability[i]<0.4:
             p = round(probability[i][0],3)
             label = "The sample (" + str(i+1) + ") is more like to be a Normal cell with probability of cancer : " + str(p)
             string_out = label
             st.success(string_out)
 
-        elif probability[i]>0.7:
+        elif probability[i]>0.6:
             p = round(probability[i][0],3)
             label = "The sample (" + str(i+1) + ") is more like to be a Cancer cell with probability of cancer : " + str(p)
             string_out = label
